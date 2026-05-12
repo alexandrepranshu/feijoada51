@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Confirmar Presença · Feijoada de 51 Anos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500;1,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, update, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDLqVvrKCZ_mb078tFW08bgvfXBvrMTNsM",
+    authDomain: "feijoada-51.firebaseapp.com",
+    databaseURL: "https://feijoada-51-default-rtdb.firebaseio.com",
+    projectId: "feijoada-51",
+    storageBucket: "feijoada-51.firebasestorage.app",
+    messagingSenderId: "844741581558",
+    appId: "1:844741581558:web:a1a87b4ce9958598b92ad7"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window._db = db; window._ref = ref; window._update = update; window._get = get;
+
+  const params = new URLSearchParams(window.location.search);
+  window._guestId = params.get('id');
+  window._guestName = decodeURIComponent(params.get('nome') || '');
+
+  if (window._guestId) {
+    get(ref(db, 'convidados/' + window._guestId))
+      .then(snap => initPage(snap.exists() ? snap.val() : null))
+      .catch(() => initPage(null));
+  } else {
+    initPage(null);
+  }
+</script>
+
+<style>
+:root {
+  --bg:#1e1208; --card:#faf7f0;
+  --text:#2a1a08; --text2:#5c4020; --text3:#9e7848;
+  --amber:#c67c2a; --amber2:#e8a040; --amber-light:#fdf3e0;
+  --gold:#d4a530;
+  --green:#2e6030; --green-light:#eaf4ea;
+  --red:#902828; --red-light:#fdeaea;
+  --border:rgba(198,124,42,0.2);
+  --r:12px; --rlg:20px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:20px;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% 0%,rgba(198,124,42,0.15) 0%,transparent 70%),
+    radial-gradient(ellipse 50% 40% at 80% 90%,rgba(139,80,20,0.1) 0%,transparent 60%);
+}
+
+/* decoração flutuante */
+.deco{position:fixed;pointer-events:none;opacity:.1;animation:fl 8s ease-in-out infinite;font-size:20px;}
+.d1{top:8%;left:4%;} .d2{top:18%;right:7%;font-size:15px;animation-delay:1.5s;}
+.d3{top:58%;left:3%;font-size:14px;animation-delay:3s;} .d4{bottom:18%;right:5%;animation-delay:1s;}
+.d5{bottom:10%;left:14%;font-size:14px;animation-delay:4s;}
+@keyframes fl{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-14px) rotate(5deg)}}
+
+.card{
+  background:var(--card);border-radius:var(--rlg);
+  padding:40px 36px;width:100%;max-width:480px;
+  position:relative;z-index:1;
+  box-shadow:0 24px 80px rgba(0,0,0,.5),0 4px 20px rgba(0,0,0,.3);
+}
+.topbar{height:4px;background:linear-gradient(90deg,var(--amber),var(--gold),var(--amber));border-radius:4px 4px 0 0;position:absolute;top:0;left:0;right:0;}
+
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--amber);background:var(--amber-light);padding:5px 12px;border-radius:99px;margin-bottom:20px;border:1px solid rgba(198,124,42,.2);}
+
+.icon{font-size:48px;text-align:center;margin-bottom:16px;}
+h1{font-family:'Playfair Display',serif;font-size:28px;font-style:italic;color:var(--text);line-height:1.2;margin-bottom:6px;text-align:center;}
+.gname{font-family:'Playfair Display',serif;font-size:22px;font-weight:600;color:var(--amber);text-align:center;margin-bottom:24px;}
+
+.divider{height:1px;background:var(--border);margin:20px 0;}
+
+/* imagem do evento */
+.evimg{
+  width:100%;height:160px;
+  background:linear-gradient(135deg,#3a1a00,#6a3010,#2a1000);
+  border-radius:var(--r);margin-bottom:24px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:56px;border:1px solid var(--border);
+  overflow:hidden;position:relative;
+}
+/* Para usar imagem real:
+   <img src="SUA_FOTO.jpg" alt="Feijoada" class="evimg" style="object-fit:cover;font-size:0"> */
+
+.details{display:flex;flex-direction:column;gap:12px;margin-bottom:24px;}
+.ditem{display:flex;align-items:flex-start;gap:12px;}
+.dico{font-size:18px;flex-shrink:0;margin-top:1px;}
+.dlbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);font-weight:600;}
+.dval{font-size:15px;font-weight:500;color:var(--text);margin-top:1px;}
+.dsub{font-size:13px;color:var(--text3);margin-top:2px;}
+
+/* form */
+.flbl{font-size:13px;font-weight:600;color:var(--text2);margin-bottom:8px;display:block;}
+.fsec{margin-bottom:20px;}
+.popts{display:flex;gap:8px;flex-wrap:wrap;}
+.pbtn{padding:8px 16px;border-radius:99px;font-size:13px;border:1.5px solid var(--border);background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.pbtn:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-light);}
+.pbtn.sel{background:var(--amber);color:#fff;border-color:transparent;}
+
+textarea.noteinp{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-size:14px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--text);resize:none;height:80px;transition:border-color .2s;}
+textarea.noteinp:focus{outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(198,124,42,.1);}
+
+.actbtns{display:flex;flex-direction:column;gap:10px;margin-top:24px;}
+.btnconf{width:100%;padding:16px;background:var(--amber);color:#fff;border:none;border-radius:var(--r);font-size:16px;font-weight:600;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:.02em;}
+.btnconf:hover{background:#a86520;transform:translateY(-1px);box-shadow:0 8px 24px rgba(198,124,42,.35);}
+.btnconf:active{transform:scale(.99);}
+.btndecl{width:100%;padding:12px;background:transparent;color:var(--text3);border:1.5px solid rgba(0,0,0,.1);border-radius:var(--r);font-size:14px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.btndecl:hover{background:var(--red-light);color:var(--red);border-color:rgba(144,40,40,.2);}
+
+/* estados */
+.sucscreen,.decscreen{display:none;text-align:center;}
+.sucico{font-size:64px;margin-bottom:16px;animation:popin .5s cubic-bezier(.175,.885,.32,1.275);}
+@keyframes popin{from{transform:scale(0)}to{transform:scale(1)}}
+.suctit{font-family:'Playfair Display',serif;font-size:26px;color:var(--green);margin-bottom:8px;}
+.sucsub{font-size:15px;color:var(--text2);line-height:1.6;}
+.dectit{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:8px;font-style:italic;}
+.decsub{font-size:14px;color:var(--text2);line-height:1.6;}
+
+.already{background:var(--green-light);color:var(--green);padding:12px 16px;border-radius:var(--r);font-size:14px;font-weight:500;text-align:center;margin-bottom:16px;border:1px solid rgba(46,96,48,.2);}
+
+.loading{text-align:center;padding:20px;color:var(--text3);font-size:14px;}
+.spin{display:inline-block;width:18px;height:18px;border:2px solid rgba(198,124,42,.2);border-top-color:var(--amber);border-radius:50%;animation:sp .8s linear infinite;margin-right:8px;vertical-align:middle;}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+footer{text-align:center;margin-top:20px;font-size:12px;color:rgba(255,210,130,.25);position:relative;z-index:1;}
+</style>
+</head>
+<body>
+
+<span class="deco d1">🍲</span>
+<span class="deco d2">🎉</span>
+<span class="deco d3">🎂</span>
+<span class="deco d4">🍷</span>
+<span class="deco d5">🎶</span>
+
+<div class="card" id="card">
+  <div class="topbar"></div>
+  <div class="loading"><span class="spin"></span> Carregando convite…</div>
+</div>
+
+<footer>Com carinho · Feijoada de 51 Anos · Alexandre</footer>
+
+<script>
+// Informações da festa — mantenha igual ao admin.html
+const FESTA = {
+  nome: "Alexandre",
+  data: "13 de junho de 2026",
+  horario: "12h",
+  local: "Brasília, DF",
+  endereco: "Coloque o endereço completo aqui"
+};
+
+let selPlus = 0;
+
+function initPage(guest) {
+  const name = guest ? guest.name : (window._guestName || 'Você');
+  const fn = name.split(' ')[0];
+  const jaConf = guest && guest.status === 'confirmed';
+  const jaDecl = guest && guest.status === 'declined';
+
+  document.getElementById('card').innerHTML = `
+    <div class="topbar"></div>
+
+    <div style="text-align:center">
+      <div class="icon">🍲</div>
+      <div class="tag">🎂 Você está convidado(a)</div>
+      <h1>Feijoada de 51 Anos</h1>
+      <div class="gname">${name}</div>
+    </div>
+
+    <div class="evimg">🍲</div>
+
+    <div class="details">
+      <div class="ditem">
+        <div class="dico">📅</div>
+        <div><div class="dlbl">Data</div><div class="dval">${FESTA.data}</div></div>
+      </div>
+      <div class="ditem">
+        <div class="dico">⏰</div>
+        <div><div class="dlbl">Horário</div><div class="dval">${FESTA.horario}</div></div>
+      </div>
+      <div class="ditem">
+        <div class="dico">📍</div>
+        <div><div class="dlbl">Local</div><div class="dval">${FESTA.local}</div><div class="dsub">${FESTA.endereco}</div></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    ${jaConf ? `<div class="already">✓ Você já confirmou presença! Te esperamos no dia ${FESTA.data}. 🎉</div>` : ''}
+    ${jaDecl ? `<div style="background:var(--red-light);color:var(--red);padding:12px 16px;border-radius:var(--r,12px);font-size:14px;text-align:center;margin-bottom:16px;border:1px solid rgba(144,40,40,.2)">Você informou que não pode comparecer. Mudou de ideia? Confirme abaixo!</div>` : ''}
+
+    <div id="fmsec">
+      <div class="fsec">
+        <label class="flbl">Vai levar acompanhante?</label>
+        <div class="popts">
+          <button class="pbtn sel" onclick="selP(this,0)">Só eu 🙋</button>
+          <button class="pbtn" onclick="selP(this,1)">+1 pessoa</button>
+          <button class="pbtn" onclick="selP(this,2)">+2 pessoas</button>
+          <button class="pbtn" onclick="selP(this,3)">+3 ou mais</button>
+        </div>
+      </div>
+      <div class="fsec">
+        <label class="flbl">Deixe um recado para o Alexandre 💬</label>
+        <textarea class="noteinp" id="noteinp" placeholder="Escreva aqui seu recado (opcional)…"></textarea>
+      </div>
+      <div class="actbtns">
+        <button class="btnconf" onclick="confirmP()">🎉 Confirmar presença!</button>
+        <button class="btndecl" onclick="declineP()">Não poderei comparecer</button>
+      </div>
+    </div>
+
+    <div class="sucscreen" id="sucscreen">
+      <div class="sucico">🎊</div>
+      <div class="suctit">Presença confirmada!</div>
+      <div class="sucsub">Que ótimo, <strong>${fn}</strong>! Você está na lista. 🍲<br><br>Te esperamos em <strong>${FESTA.data}</strong> às <strong>${FESTA.horario}</strong>.<br><br>Até lá! 🎂</div>
+    </div>
+
+    <div class="decscreen" id="decscreen">
+      <div style="font-size:48px;margin-bottom:16px">😢</div>
+      <div class="dectit">Que pena, ${fn}!</div>
+      <div class="decsub">Ficamos tristes com a sua falta, mas entendemos.<br><br>Se mudar de ideia até <strong>${FESTA.data}</strong>, clique no link do convite novamente. 😊</div>
+    </div>
+  `;
+}
+
+function selP(el, v) {
+  selPlus = v;
+  document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+}
+
+function confirmP() {
+  const note = (document.getElementById('noteinp') || {}).value || '';
+  const id = window._guestId;
+  if (!id || !window._db) { showSuc(); return; }
+  const btn = document.querySelector('.btnconf');
+  btn.textContent = '⏳ Salvando…'; btn.disabled = true;
+  window._update(window._ref(window._db, 'convidados/' + id), {
+    status: 'confirmed',
+    plusOne: selPlus,
+    guestNote: note,
+    confirmedAt: new Date().toLocaleString('pt-BR')
+  }).then(showSuc).catch(() => { btn.textContent = '🎉 Confirmar presença!'; btn.disabled = false; alert('Erro ao salvar. Tente novamente.'); });
+}
+
+function declineP() {
+  const id = window._guestId;
+  if (!id || !window._db) { showDecl(); return; }
+  if (!confirm('Tem certeza que não poderá comparecer?')) return;
+  window._update(window._ref(window._db, 'convidados/' + id), {
+    status: 'declined', confirmedAt: null
+  }).then(showDecl).catch(() => alert('Erro. Tente novamente.'));
+}
+
+function showSuc() {
+  document.getElementById('fmsec').style.display = 'none';
+  document.getElementById('sucscreen').style.display = 'block';
+}
+function showDecl() {
+  document.getElementById('fmsec').style.display = 'none';
+  document.getElementById('decscreen').style.display = 'block';
+}
+</script>
+</body>
+</html>
